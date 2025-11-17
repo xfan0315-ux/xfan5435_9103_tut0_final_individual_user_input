@@ -49,25 +49,67 @@ function draw() {
 }
 
 /**
- * CircleArt class - represents a scalable, translatable circle composition
- * Each instance stores position, scale, and a custom drawing function
+ * CircleArt class — each circle composition becomes a "creature"
+ * that subtly moves, rotates and scales according to Perlin Noise.
+ *
+ * This version replaces the original static display() method.
+ * Noise-driven animation makes each circle feel organic and
+ * visually distinct from the group’s static base image.
  */
 class CircleArt {
+
   constructor(x, y, scale, drawFn) {
-    this.x = x;           // X position on canvas
-    this.y = y;           // Y position on canvas
-    this.scale = scale;   // Scale multiplier
-    this.drawFn = drawFn; // Drawing function for this circle
+    // Initial static properties
+    this.x = x;              // Original X position on canvas
+    this.y = y;              // Original Y position on canvas
+    this.scale = scale;      // Base scale multiplier
+    this.drawFn = drawFn;    // Custom drawing function for this circle
+
+    // Noise seeds — each circle receives unique noise offsets
+    // These ensure circles never move in the same pattern
+    this.nx = random(1000);  // Noise seed for X-offset
+    this.ny = random(1000);  // Noise seed for Y-offset
+    this.ns = random(1000);  // Noise seed for scaling (breathing effect)
+    this.nr = random(1000);  // Noise seed for rotation
   }
 
   /**
-   * Display the circle at its position with its scale
+   * Display the circle using noise-driven transformations.
+   * tt = time variable passed from the main draw() loop.
    */
-  display() {
+  display(tt) {
+
+    // --- 1. Noise-driven position offset (subtle drifting motion)
+    const dx = map(
+      noise(this.nx + tt), 0, 1,
+      -NOISE.wiggle, NOISE.wiggle
+    );
+    const dy = map(
+      noise(this.ny + tt), 0, 1,
+      -NOISE.wiggle, NOISE.wiggle
+    );
+
+    // --- 2. Noise-driven scaling ("breathing")
+    const sc = this.scale * map(
+      noise(this.ns + tt), 0, 1,
+      NOISE.sMin, NOISE.sMax
+    );
+
+    // --- 3. Noise-driven micro-rotation
+    const ang = map(
+      noise(this.nr + tt), 0, 1,
+      -NOISE.rotMax, NOISE.rotMax
+    );
+
+    // --- Apply all transformations ---
     push();
-    translate(this.x, this.y);
-    scale(this.scale);
-    this.drawFn();
+    translate(this.x + dx, this.y + dy);
+    rotate(ang);
+    scale(sc);
+
+    // Draw the circle's custom graphic
+    this.drawFn(tt);
+
     pop();
   }
 }
