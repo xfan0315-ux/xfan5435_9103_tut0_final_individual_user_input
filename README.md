@@ -1,4 +1,4 @@
-# xfan5435_9103_tut0_final_individual_user_input
+# xfan5435_9103_tut0_final_individual_Perlin_Noise
 
 # CircleArt – Interactive Perlin Noise Edition
 Individual Functional Prototype – by Xingyuan Fang
